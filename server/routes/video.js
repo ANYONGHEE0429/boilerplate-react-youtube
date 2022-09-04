@@ -10,35 +10,31 @@ let storage = multer.diskStorage({
         cb(null, "uploads/");
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}_${file.originalname}`);
+        cb(null, `${Date.now()}_${file.originalname}`)
     },
     fileFilter: (req, file, cb) => {
-        const ext = path.extname(file.originalname)
-        if (ext !== '.mp4') {
-            return cb(res.status(400).end('only mp4 is allowed'), false);
+        const ext = path.extname(file.originalname);
+        if (ext !== '.mp4'){
+            return cb(res.status(400).end('only jpg, mp4 is allowed'), false);
         }
-        cb(null, true)
-    }
+        cb(null, true);
+    },
 });
 
-const upload = multer({ storage: storage}).single("file");
-
+var upload = multer({storage: storage}).single("file");
 
 //=================================
 //             Video
 //=================================
 
-
 router.post('/uploads', (req, res) => {
-
-    // 비디오를 저장한다.
-    upload(req, res, err => {
-        if(err) {
-            return res.json({ success: false, err})
+    // save video on server
+    upload(req, res, (err) => {
+        if (err) {
+            return res.json({success: false, err})
         }
-        return res.json({ success: true, url: res.req.file.path, filename: res.req.file.filename })
+        return res.json({success: true, url: res.req.file.path, fileName: res.req.file.filename})
     })
-
 })
 
 module.exports = router;

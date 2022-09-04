@@ -1,13 +1,9 @@
-import React, { useState } from "react";
-
 import { Typography, Button, Form, message, Input, Icon } from "antd";
-
+import React, { useState } from "react";
 import Dropzone from "react-dropzone";
-import Axios from "axios";
-import { response } from "express";
+import { axios } from "axios";
 
 const { TextArea } = Input;
-
 const { Title } = Typography;
 
 const PrivateOptions = [
@@ -16,21 +12,22 @@ const PrivateOptions = [
 ];
 
 const CategoryOptions = [
-  { value: 0, label: "File & Animation" },
-  { value: 1, label: "Auto & Vehi" },
+  { value: 0, label: "Film & Animation" },
+  { value: 1, label: "Autos & Vehicles" },
   { value: 2, label: "Music" },
   { value: 3, label: "Pets & Animals" },
 ];
 
 function VideoUploadPage() {
-  const [VideoTitle, setVideoTitle] = useState("");
-  const [Description, setDescription] = useState("");
+  const [videoTitle, setVideoTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [Private, setPrivate] = useState(0);
-  const [Category, setCategory] = useState("Film & Animation");
+  const [category, setCategory] = useState("Film & Animation");
 
   const onTitleChange = (e) => {
     setVideoTitle(e.currentTarget.value);
   };
+
   const onDescriptionChange = (e) => {
     setDescription(e.currentTarget.value);
   };
@@ -38,36 +35,39 @@ function VideoUploadPage() {
   const onPrivateChange = (e) => {
     setPrivate(e.currentTarget.value);
   };
+
   const onCategoryChange = (e) => {
     setCategory(e.currentTarget.value);
   };
+
   const onDrop = (files) => {
+    console.log(files);
     let formData = new FormData();
     const config = {
       header: { "content-type": "multipart/form-data" },
     };
+
     formData.append("file", files[0]);
 
-    Axios.post("/api/video/uploads", formData, config).then((response) => {
+    axios.post("/api/video/uploads", formData, config).then((response) => {
       if (response.data.success) {
-        console.log(responst.data);
+        console.log(response.data);
       } else {
-        alert("비디오 업로드를 실패했습니다.");
+        console.log("failed");
+        alert("video upload failed.");
       }
     });
   };
 
   return (
     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+      <div style={{ textalign: "center", marginBottom: "2rem" }}>
         <Title level={2}>Upload Video</Title>
       </div>
 
-      <Form onSubmit>
+      <Form>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Drop zone */}
-
-          <Dropzone onDrop={onDrop} multiple={false} maxSize={1000000000}>
+          <Dropzone onDrop={onDrop} multiple={false} maxSize={10000000000000}>
             {({ getRootProps, getInputProps }) => (
               <div
                 style={{
@@ -81,36 +81,27 @@ function VideoUploadPage() {
                 {...getRootProps()}
               >
                 <input {...getInputProps()} />
-
                 <Icon type="plus" style={{ fontSize: "3rem" }} />
               </div>
             )}
           </Dropzone>
 
-          {/* Thumbnail */}
-
           <div>
-            <img src alt />
+            <img />
           </div>
         </div>
 
         <br />
         <br />
-
         <label>Title</label>
-
-        <Input onChange={onTitleChange} value={VideoTitle} />
+        <Input onChange={onTitleChange} value={videoTitle} />
 
         <br />
-
         <br />
 
         <label>Description</label>
-
-        <TextArea onChange={onDescriptionChange} value={Description} />
-
+        <TextArea onChange={onDescriptionChange} value={description} />
         <br />
-
         <br />
 
         <select onChange={onPrivateChange}>
@@ -120,9 +111,11 @@ function VideoUploadPage() {
             </option>
           ))}
         </select>
+
         <br />
         <br />
-        <select onChnage={onCategoryChange}>
+
+        <select onChange={onCategoryChange}>
           {CategoryOptions.map((item, index) => (
             <option key={index} value={item.value}>
               {item.label}
@@ -132,7 +125,8 @@ function VideoUploadPage() {
 
         <br />
         <br />
-        <Button type="primary" size="large" onClick>
+
+        <Button type="primary" size="large">
           Submit
         </Button>
       </Form>
