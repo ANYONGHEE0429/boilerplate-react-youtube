@@ -29,7 +29,7 @@ function RightMenu(props) {
           <a href="/register">Signup</a>
         </Menu.Item>
       </Menu>
-      
+        
     )
   } else {
     return (
