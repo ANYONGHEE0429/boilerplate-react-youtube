@@ -28,19 +28,31 @@ var upload = multer({ storage: storage }).single("file");
 //             Video
 //=================================
 
-router.post("/uploads", (req, res) => {
-  // save video on server
-  upload(req, res, (err) => {
-    if (err) {
-      return res.json({ success: false, err });
-    }
-    return res.json({
-      success: true,
-      url: res.req.file.path,
-      fileName: res.req.file.filename,
+router.post("/uploadVideo", (req, res) => {
+  // save data into mongodb
+
+    const video = new Video(req.body) //body안에 variable 저장 
+    
+    video.save((err, doc) => {
+        if(err) return res.json({ success: false, err})
+        res.status(200).json({success: true})
+    })
+
+});
+
+router.post("/", (req, res) => {
+    // save video on server
+    upload(req, res, (err) => {
+      if (err) {
+        return res.json({ success: false, err });
+      }
+      return res.json({
+        success: true,
+        url: res.req.file.path,
+        fileName: res.req.file.filename,
+      });
     });
   });
-});
 
 router.post("/thumbnail", (req, res) => {
   // generate thumbnail & bring running time on thumbnail

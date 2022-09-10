@@ -2,6 +2,7 @@ import React, { useState, useEffect} from 'react'
 import { Typography, Button, Form, message, Input, Icon } from 'antd';
 import Dropzone from 'react-dropzone';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -11,7 +12,7 @@ const Private = [
     { value: 1, label:'Public'}
 ]
 
-const Catogory = [
+const Category = [
     { value: 0, label: "Film & Animation" },
     { value: 0, label: "Autos & Vehicles" },
     { value: 0, label: "Music" },
@@ -19,19 +20,20 @@ const Catogory = [
     { value: 0, label: "Sports" },
 ]
 
-function UploadVideoPage() {
+function UploadVideoPage(props) {
 
-    const [title, setTitle] = useState("");
+    const user = useSelector(state => state.user); //state에서 user의 정보 
+    const [VideoTitle, setVideoTitle] = useState("");
     const [Description, setDescription] = useState("");
     const [privacy, setPrivacy] = useState(0)
-    const [Categories, setCategories] = useState("Film & Animation")
+    const [Category, SetCategory] = useState("Film & Animation")
     const [FilePath, setFilePath] = useState("")
     const [Duration, setDuration] = useState("")
-    const [Thumbnail, setThumbnail] = useState("")  
+    const [ThumbnailPath, setThumbnail] = useState("")  
 
 
     const handleChangeTitle = ( event ) => {
-        setTitle(event.currentTarget.value)
+        setVideoTitle(event.currentTarget.value)
     }
 
     const handleChangeDecsription = (event) => {
@@ -45,11 +47,7 @@ function UploadVideoPage() {
     }
 
     const handleChangeTwo = (event) => {
-        setCategories(event.currentTarget.value)
-    }
-
-    const onSubmit = () => {
-        
+        setCategory(event.currentTarget.value)
     }
 
     const onDrop = ( files ) => {
@@ -77,7 +75,7 @@ function UploadVideoPage() {
                 .then(response => {
                     if(response.data.success) {
                         setDuration(response.data.fileDuration)
-                        setThumbnail(response.data.thumbsFilePath)
+                        setThumbnailPath(response.data.thumbsFilePath)
                     } else {
                         alert('Failed to make the thumbnails');
                     }
@@ -91,6 +89,38 @@ function UploadVideoPage() {
 
     }
 
+    const onSubmit = (e) => {
+        e.preverntDefault();
+        
+        const variables = {
+          writer: user.userData._id,
+          title: VideoTitle,
+          description: Description,
+          privacy: privacy,
+          filePath: FilePath ,
+          category: Category,
+          duration: Duration,
+          thumbnail: ThumbnailPath, 
+            
+        
+        }
+        axios.post('/api/video/Uploads', variables).then(
+          response=> {
+            if(response.data.success) {
+
+              message.success('성공적으로 업로드를 했습니다.')
+              setTimeout(() => {
+                
+              }, 3000);
+              
+              props.history.push('/')
+            } else (
+              alert('비디오 업로드에 실패했습니다')
+            )
+          }
+        )
+      }
+  
     return (
         <div style={{ maxWidth: '700px', margin: '2rem auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -125,7 +155,7 @@ function UploadVideoPage() {
             <label>Title</label>
             <Input
                  onChange={handleChangeTitle}
-                 value={title}
+                 value={VideoTitle}
             />
             <br /><br />
             <label>Description</label>
@@ -143,7 +173,7 @@ function UploadVideoPage() {
             <br /><br />
 
             <select onChange={handleChangeTwo}>
-                {Catogory.map((item, index) => (
+                {Category.map((item, index) => (
                     <option key={index} value={item.label}>{item.label}</option>
                 ))}
             </select>
